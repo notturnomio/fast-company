@@ -7,6 +7,7 @@ import api from "../api";
 import SearchStatus from "../components/searchStatus";
 import UsersTable from "../components/usersTable";
 import _ from "lodash";
+import SearchUser from "../components/searchUser";
 
 const Users = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,6 +18,7 @@ const Users = () => {
   const pageSize = 8;
 
   const [users, setUsers] = useState();
+  const [searchedUsers, setSearchedUsers] = useState("");
 
   useEffect(() => {
     api.users.fetchAll().then((data) => setUsers(data));
@@ -42,10 +44,16 @@ const Users = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedProf]);
+  }, [selectedProf, searchedUsers]);
 
   const handleProfessionSelect = (item) => {
+    searchedUsers !== "" && setSearchedUsers("");
     setSelectedProf(item);
+  };
+
+  const handleSearch = ({ target }) => {
+    setSelectedProf(undefined);
+    setSearchedUsers(target.value);
   };
 
   const handlePageChange = (pageIndex) => {
@@ -57,7 +65,11 @@ const Users = () => {
   };
 
   if (users) {
-    const filteredUsers = selectedProf
+    const filteredUsers = searchedUsers
+      ? users.filter((user) =>
+          user.name.toLowerCase().includes(searchedUsers.toLowerCase())
+        )
+      : selectedProf
       ? users.filter((user) => {
           // JSON.stringify(user.profession) === JSON.stringify(selectedProf)
           return user.profession._id === selectedProf._id;
@@ -87,6 +99,7 @@ const Users = () => {
         )}
         <div className="d-flex flex-column">
           <SearchStatus length={count} />
+          <SearchUser onChange={handleSearch} value={searchedUsers} />
           {count > 0 && (
             <UsersTable
               users={userCrop}
