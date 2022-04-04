@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
-import api from "../api";
-import { useHistory, useParams } from "react-router-dom";
-import QualitiesList from "../components/qualitiesList";
+import api from "../../../api";
+import { useHistory } from "react-router-dom";
+import Qualities from "../../ui/qualities";
+import PropTypes from "prop-types";
 
-const UserCard = () => {
+const UserPage = ({ userId }) => {
   const history = useHistory();
   const getAllUsers = () => {
     history.push("/users");
   };
-  const params = useParams();
 
   const [user, setUser] = useState();
 
   useEffect(() => {
-    api.users.getById(params.postId).then((data) => setUser(data));
+    api.users.getById(userId).then((data) => setUser(data));
   }, []);
 
   if (user) {
@@ -21,7 +21,7 @@ const UserCard = () => {
       <div id={user._id} className="m-4">
         <h1>{user.name}</h1>
         <h2>Profession: {user.profession.name}</h2>
-        <QualitiesList qualities={user.qualities} />
+        <Qualities qualities={user.qualities} />
         <p>Completed Dates: {user.completedMeetings}</p>
         <h2>Rate: {user.rate}</h2>
         <button
@@ -37,4 +37,7 @@ const UserCard = () => {
   return <div className="m-4">Loading...</div>;
 };
 
-export default UserCard;
+UserPage.propTypes = {
+  userId: PropTypes.string,
+};
+export default UserPage;
