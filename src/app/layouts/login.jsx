@@ -21,22 +21,30 @@ const Login = () => {
         <div className="col-md-6 offset-md-3 shadow p-4">
           {formType === "register" ? (
             <>
-              <h3 className="mb-4">Register</h3>
+              <h3 className="mb-4 text-primary">Register</h3>
               <RegisterForm />
               <p>
                 If you already have an account please{" "}
-                <a role="button" onClick={toggleFormType}>
+                <a
+                  className="link-primary"
+                  role="button"
+                  onClick={toggleFormType}
+                >
                   Sign In
                 </a>
               </p>
             </>
           ) : (
             <>
-              <h3 className="mb-4">Login</h3>
+              <h3 className="mb-4 text-primary">Login</h3>
               <LoginForm />
               <p>
                 Don&apos;t have an account yet?{" "}
-                <a role="button" onClick={toggleFormType}>
+                <a
+                  className="link-primary"
+                  role="button"
+                  onClick={toggleFormType}
+                >
                   Sign Up
                 </a>
               </p>

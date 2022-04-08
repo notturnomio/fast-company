@@ -3,17 +3,30 @@ import { validator } from "../../utils/validator";
 import TextField from "../common/form/textField";
 import api from "../../api";
 import SelectField from "../common/form/selectField";
+import RadioField from "../common/form/radioField";
+import MultiSelect from "../common/form/multiSelectField";
+import CheckBoxField from "../common/form/checkBoxField";
 
 const RegisterForm = () => {
-  const [data, setData] = useState({ email: "", password: "", profession: "" });
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+    profession: "",
+    sex: "male",
+    qualities: [],
+    license: false,
+  });
+
   const [errors, setErrors] = useState({});
   const [professions, setProfession] = useState();
+  const [qualities, setQualities] = useState({});
 
   useEffect(() => {
     api.professions.fetchAll().then((data) => setProfession(data));
+    api.qualities.fetchAll().then((data) => setQualities(data));
   }, []);
 
-  const handleChange = ({ target }) => {
+  const handleChange = (target) => {
     setData((prevState) => ({
       ...prevState,
       [target.name]: target.value,
@@ -23,7 +36,7 @@ const RegisterForm = () => {
   const validatorConfig = {
     email: {
       isRequired: { message: "This field is required." },
-      isEmail: { message: "Email address is invalid." },
+      isEmail: { message: "E-mail address is invalid." },
     },
     password: {
       isRequired: { message: "This field is required." },
@@ -39,6 +52,9 @@ const RegisterForm = () => {
       },
     },
     profession: { isRequired: { message: "This field is required." } },
+    license: {
+      isRequired: { message: "You must agree to the terms and conditions" },
+    },
   };
 
   useEffect(() => {
@@ -62,7 +78,7 @@ const RegisterForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <TextField
-        label="Email"
+        label="E-mail"
         type="text"
         name="email"
         value={data.email}
@@ -78,13 +94,43 @@ const RegisterForm = () => {
         error={errors.password}
       />
       <SelectField
-        label="Choose your profession..."
+        label="Your profession"
         value={data.profession}
+        name="profession"
         onChange={handleChange}
         defaultOption={"Choose..."}
         options={professions}
         error={errors.profession}
       />
+      <RadioField
+        options={[
+          { name: "Male", value: "male" },
+          { name: "Female", value: "female" },
+          { name: "Other", value: "other" },
+        ]}
+        name="sex"
+        onChange={handleChange}
+        value={data.sex}
+        label="Your gender"
+      />
+      <MultiSelect
+        options={qualities}
+        onChange={handleChange}
+        defaultValue={data.qualities}
+        label="Your qualities (multiple selection)"
+        name="qualities"
+      />
+      <CheckBoxField
+        value={data.license}
+        onChange={handleChange}
+        name="license"
+        error={errors.license}
+      >
+        Agree to{" "}
+        <a className="link-primary" role="button">
+          Terms and Conditions
+        </a>
+      </CheckBoxField>
       <button
         disabled={!isValid}
         className="btn btn-primary w-100 mx-auto mb-4"

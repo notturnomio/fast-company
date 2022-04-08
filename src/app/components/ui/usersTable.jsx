@@ -1,9 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
+
 import Bookmark from "../common/bookmark";
 import Qualities from "./qualities";
 import Table from "../common/table";
-import SelectUser from "./selectUser";
+import { Link } from "react-router-dom";
 
 const UsersTable = ({
   users,
@@ -17,7 +18,7 @@ const UsersTable = ({
     name: {
       path: "name",
       name: "Name",
-      component: (user) => <SelectUser selected={user} />,
+      component: (user) => <Link to={`/users/${user._id}`}>{user.name}</Link>,
     },
     qualities: {
       name: "Qualities",
