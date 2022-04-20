@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../api";
 import { useHistory } from "react-router-dom";
-import Qualities from "../../ui/qualities";
 import PropTypes from "prop-types";
+import Comments from "../../ui/comments";
+import UserCard from "../../ui/userCard";
+import QualitiesCard from "../../ui/qualitiesCard";
+import MeetingsCard from "../../ui/meetingsCard";
 
 const UserPage = ({ userId }) => {
   const history = useHistory();
@@ -10,26 +13,28 @@ const UserPage = ({ userId }) => {
   useEffect(() => {
     api.users.getById(userId).then((data) => setUser(data));
   }, []);
-  console.log(userId);
+  // console.log(userId);
 
   const getAllUsers = () => {
     history.push("/users");
   };
 
-  const handleEdit = () => {
-    history.push(history.location.pathname + "/edit");
-  };
-
   if (user) {
     return (
-      <div className="m-4">
-        <h1>{user.name}</h1>
-        <h2>Profession: {user.profession.name}</h2>
-        <Qualities qualities={user.qualities} />
-        <p>Completed Dates: {user.completedMeetings}</p>
-        <h2>Rate: {user.rate}</h2>
-        <button onClick={handleEdit}>Edit User</button>
-        <button onClick={getAllUsers}>Back To All Users</button>
+      <div className="container">
+        <div className="row gutters-sm">
+          <div className="col-md-4 mb-3">
+            <UserCard user={user} />
+            <QualitiesCard data={user.qualities} />
+            <MeetingsCard value={user.completedMeetings} />
+          </div>
+          <div className="col-md-8">
+            <Comments />
+            <button className="btn btn-primary" onClick={getAllUsers}>
+              Back To All Users
+            </button>
+          </div>
+        </div>
       </div>
     );
   } else {

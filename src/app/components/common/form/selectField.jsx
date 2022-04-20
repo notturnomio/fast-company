@@ -22,7 +22,7 @@ const SelectField = ({
     !Array.isArray(options) && typeof options === "object"
       ? Object.keys(options).map((optionName) => ({
           name: options[optionName].name,
-          id: options[optionName]._id,
+          value: options[optionName]._id,
         }))
       : options;
 
@@ -37,18 +37,17 @@ const SelectField = ({
         value={value}
         name={name}
         onChange={handleChange}
+        role="button"
       >
         <option disabled value="">
           {defaultOption}
         </option>
         {optionsArray &&
-          optionsArray.map((option) => {
-            return (
-              <option key={option.id} value={option.id}>
-                {option.name}
-              </option>
-            );
-          })}
+          optionsArray.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.name}
+            </option>
+          ))}
       </select>
       {error && <div className="invalid-feedback">{error}</div>}
     </div>
