@@ -9,7 +9,6 @@ const CommentList = ({ comments, onDelete }) => {
 };
 
 CommentList.propTypes = {
-  data: PropTypes.object,
   onDelete: PropTypes.func,
   user: PropTypes.object,
 };
