@@ -18,6 +18,13 @@ const UserProvider = ({ children }) => {
     getUsers();
   }, []);
 
+  useEffect(() => {
+    if (error !== null) {
+      toast.error(error);
+      setError(null);
+    }
+  }, [error]);
+
   async function getUsers() {
     try {
       const { content } = await userService.get();
@@ -28,15 +35,8 @@ const UserProvider = ({ children }) => {
     }
   }
 
-  useEffect(() => {
-    if (error !== null) {
-      toast(error);
-      setError(null);
-    }
-  }, [error]);
-
   function errorCatcher(error) {
-    const { message } = error.response.data;
+    const { message } = error;
     setError(message);
   }
 

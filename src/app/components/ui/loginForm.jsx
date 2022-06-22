@@ -1,40 +1,36 @@
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 import { validator } from "../../utils/validator";
 import CheckBoxField from "../common/form/checkBoxField";
 import TextField from "../common/form/textField";
 
 const LoginForm = () => {
+  const history = useHistory();
   const [data, setData] = useState({
     email: "",
     password: "",
     stayLoggedIn: false,
   });
   const [errors, setErrors] = useState({});
+  const [inputError, setInputError] = useState(null);
+
+  const { signIn } = useAuth();
 
   const handleChange = (target) => {
     setData((prevState) => ({
       ...prevState,
       [target.name]: target.value,
     }));
+    setInputError(null);
   };
 
   const validatorConfig = {
     email: {
       isRequired: { message: "This field is required." },
-      isEmail: { message: "Email address is invalid." },
     },
     password: {
       isRequired: { message: "This field is required." },
-      isCapitalSymbol: {
-        message: "Password must contain a minimum of 1 upper case letter.",
-      },
-      isContainDigit: {
-        message: "Password must contain a minimum of 1 numeric character.",
-      },
-      min: {
-        message: "Password must contain at least 8 characters.",
-        value: 8,
-      },
     },
   };
 
@@ -49,11 +45,16 @@ const LoginForm = () => {
 
   const isValid = Object.keys(errors).length === 0;
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const isValid = validate();
     if (!isValid) return;
-    console.log(data);
+    try {
+      await signIn(data);
+      history.push("/");
+    } catch (error) {
+      setInputError(error.message);
+    }
   };
 
   return (
@@ -81,8 +82,10 @@ const LoginForm = () => {
       >
         Stay Logged In
       </CheckBoxField>
+      {inputError && <div className="text-danger mb-4">{inputError}</div>}
       <button
-        disabled={!isValid}
+        type="submit"
+        disabled={!isValid || inputError}
         className="btn btn-primary w-100 mx-auto mb-4"
       >
         Submit

@@ -19,7 +19,7 @@ const UsersListPage = () => {
   const pageSize = 8;
 
   const { users } = useUser();
-  console.log(users);
+  // console.log(users);
   const [searchedUsers, setSearchedUsers] = useState("");
 
   const handleDelete = (userId) => {
