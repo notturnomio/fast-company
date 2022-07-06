@@ -9,8 +9,8 @@ const Main = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h1 className="m-4">Main Page</h1>
+    <div className="container mt-5 w-75">
+      <h1 className="mt-4 mb-4">Main Page</h1>
       <h3>Initialize mockData in FireBase</h3>
       <ul>
         <li>Status: {status}</li>

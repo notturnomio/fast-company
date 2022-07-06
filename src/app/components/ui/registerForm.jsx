@@ -17,6 +17,7 @@ const RegisterForm = () => {
     password: "",
     profession: "",
     sex: "male",
+    name: "",
     qualities: [],
     license: false,
   });
@@ -60,6 +61,13 @@ const RegisterForm = () => {
       min: {
         message: "Password must contain at least 8 characters.",
         value: 8,
+      },
+    },
+    name: {
+      isRequired: { message: "This field is required." },
+      min: {
+        message: "Name must contain at least 3 characters.",
+        value: 3,
       },
     },
     profession: { isRequired: { message: "This field is required." } },
@@ -113,6 +121,14 @@ const RegisterForm = () => {
         value={data.password}
         onChange={handleChange}
         error={errors.password}
+      />
+      <TextField
+        label="Name"
+        type="text"
+        name="name"
+        value={data.name}
+        onChange={handleChange}
+        error={errors.name}
       />
       <SelectField
         label="Your profession"

@@ -3,9 +3,12 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import userService from "../services/user.service";
 import { toast } from "react-toastify";
-import { setTokens } from "../services/localStorage.service";
+import { useHistory } from "react-router-dom";
+import localStorageService, {
+  setTokens,
+} from "../services/localStorage.service";
 
-const httpAuth = axios.create({
+export const httpAuth = axios.create({
   baseURL: "https://identitytoolkit.googleapis.com/v1/",
   params: { key: process.env.REACT_APP_FIREBASE_KEY },
 });
@@ -16,8 +19,10 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState({});
+  const [currentUser, setCurrentUser] = useState();
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const history = useHistory();
 
   async function signIn({ email, password }) {
     try {
@@ -27,6 +32,7 @@ const AuthProvider = ({ children }) => {
         returnSecureToken: true,
       });
       setTokens(data);
+      await getUserData();
     } catch (error) {
       errorCatcher(error);
       const { code, message } = error.response.data.error;
@@ -39,8 +45,13 @@ const AuthProvider = ({ children }) => {
             throw new Error("Too many attempts. Try again later");
         }
       }
-      // throw new Error(error);
     }
+  }
+
+  function logOut() {
+    localStorageService.removeAuthData();
+    setCurrentUser(null);
+    history.push("/");
   }
 
   async function signUp({ email, password, ...rest }) {
@@ -51,7 +62,18 @@ const AuthProvider = ({ children }) => {
         returnSecureToken: true,
       });
       setTokens(data);
-      await createUser({ _id: data.localId, email, ...rest });
+      await createUser({
+        _id: data.localId,
+        email,
+        rate: randomInt(1, 5),
+        completedMeetings: randomInt(0, 200),
+        avatar: `https://avatars.dicebear.com/api/avataaars/${(
+          Math.random() + 1
+        )
+          .toString(36)
+          .substring(7)}.svg`,
+        ...rest,
+      });
     } catch (error) {
       errorCatcher(error);
       const { code, message } = error.response.data.error;
@@ -62,14 +84,40 @@ const AuthProvider = ({ children }) => {
           throw errorObject;
         }
       }
-      // throw new Error(error);
     }
+  }
+
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   async function createUser(data) {
     try {
       const { content } = await userService.create(data);
       setCurrentUser(content);
+      console.log(content);
+      return content;
+    } catch (error) {
+      errorCatcher(error);
+    }
+  }
+
+  async function getUserData() {
+    try {
+      const { content } = await userService.getCurrentUser();
+      setCurrentUser(content);
+    } catch (error) {
+      errorCatcher(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function updateUserData(data) {
+    try {
+      const { content } = await userService.update(data);
+      setCurrentUser(content);
+      // console.log(content);
       return content;
     } catch (error) {
       errorCatcher(error);
@@ -88,9 +136,19 @@ const AuthProvider = ({ children }) => {
     }
   }, [error]);
 
+  useEffect(() => {
+    if (localStorageService.getAccessToken()) {
+      getUserData();
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ signUp, signIn, currentUser }}>
-      {children}
+    <AuthContext.Provider
+      value={{ signUp, signIn, logOut, updateUserData, currentUser }}
+    >
+      {!isLoading ? children : "Loading..."}
     </AuthContext.Provider>
   );
 };
