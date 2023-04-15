@@ -1,9 +1,9 @@
 import React from "react";
 import { displayDate } from "../../../utils/displayDate";
 import PropTypes from "prop-types";
-import { useUser } from "../../../hooks/useUsers";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../../hooks/useAuth";
+import { useSelector } from "react-redux";
+import { getCurrentUserId, getUserById } from "../../../store/users";
 
 const Comment = ({
   userId,
@@ -12,9 +12,8 @@ const Comment = ({
   created_at: created,
   onDelete,
 }) => {
-  const { getUserById } = useUser();
-  const user = getUserById(userId);
-  const { currentUser } = useAuth();
+  const user = useSelector(getUserById(userId));
+  const currentUserId = useSelector(getCurrentUserId());
 
   return (
     <div className="bg-light card-body mb-3">
@@ -35,7 +34,7 @@ const Comment = ({
                     {user && <Link to={`/users/${userId}`}>{user.name}</Link>}{" "}
                     <span className="small">- {displayDate(created)}</span>
                   </p>
-                  {userId === currentUser._id && (
+                  {userId === currentUserId && (
                     <button
                       onClick={() => onDelete(id)}
                       className="btn btn-sm text-primary d-flex align-items-center"

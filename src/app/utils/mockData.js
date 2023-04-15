@@ -42,15 +42,15 @@ const useMockData = () => {
   async function initialize() {
     try {
       for (const prof of professions) {
-        await httpService.put("profession/" + prof._id, prof);
+        await httpService.patch("profession/" + prof._id, prof);
         incrementCount();
       }
       for (const qual of qualities) {
-        await httpService.put("quality/" + qual._id, qual);
+        await httpService.patch("quality/" + qual._id, qual);
         incrementCount();
       }
       for (const user of users) {
-        await httpService.put("user/" + user._id, user);
+        await httpService.patch("user/" + user._id, user);
         incrementCount();
       }
     } catch (error) {

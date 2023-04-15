@@ -5,13 +5,13 @@ import SelectField from "../common/form/selectField";
 import RadioField from "../common/form/radioField";
 import MultiSelect from "../common/form/multiSelectField";
 import CheckBoxField from "../common/form/checkBoxField";
-import { useQualities } from "../../hooks/useQualities";
-import { useProfession } from "../../hooks/useProfession";
-import { useAuth } from "../../hooks/useAuth";
-import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getQualities } from "../../store/qualities";
+import { getProfessions } from "../../store/professions";
+import { getAuthErrors, signUp } from "../../store/users";
 
 const RegisterForm = () => {
-  const history = useHistory();
+  const dispatch = useDispatch();
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -22,16 +22,15 @@ const RegisterForm = () => {
     license: false,
   });
 
-  const { signUp } = useAuth();
-
   const [errors, setErrors] = useState({});
-  const { professions } = useProfession();
+  const inputError = useSelector(getAuthErrors());
+  const professions = useSelector(getProfessions());
   const professionsList = professions.map((prof) => ({
     label: prof.name,
     value: prof._id,
   }));
 
-  const { qualities } = useQualities();
+  const qualities = useSelector(getQualities());
   const qualitiesList = qualities.map((qual) => ({
     label: qual.name,
     value: qual._id,
@@ -88,7 +87,7 @@ const RegisterForm = () => {
 
   const isValid = Object.keys(errors).length === 0;
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     const isValid = validate();
     if (!isValid) return;
@@ -96,12 +95,7 @@ const RegisterForm = () => {
       ...data,
       qualities: data.qualities.map((quality) => quality.value),
     };
-    try {
-      await signUp(newData);
-      history.push("/");
-    } catch (error) {
-      setErrors(error);
-    }
+    dispatch(signUp(newData));
   };
 
   return (
@@ -168,6 +162,7 @@ const RegisterForm = () => {
           Terms and Conditions
         </a>
       </CheckBoxField>
+      {inputError && <div className="text-danger mb-4">{inputError}</div>}
       <button
         disabled={!isValid}
         className="btn btn-primary w-100 mx-auto mb-4"

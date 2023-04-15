@@ -5,12 +5,11 @@ import Comments from "../../ui/comments";
 import UserCard from "../../ui/userCard";
 import QualitiesCard from "../../ui/qualitiesCard";
 import MeetingsCard from "../../ui/meetingsCard";
-import { useUser } from "../../../hooks/useUsers";
-import { CommentsProvider } from "../../../hooks/useComments";
+import { useSelector } from "react-redux";
+import { getUserById } from "../../../store/users";
 
 const UserPage = ({ userId }) => {
-  const { getUserById } = useUser();
-  const user = getUserById(userId);
+  const user = useSelector(getUserById(userId));
 
   const history = useHistory();
   const getAllUsers = () => {
@@ -27,9 +26,7 @@ const UserPage = ({ userId }) => {
             <MeetingsCard value={user.completedMeetings} />
           </div>
           <div className="col-md-8">
-            <CommentsProvider>
-              <Comments />
-            </CommentsProvider>
+            <Comments />
             <button className="btn btn-primary mt-4" onClick={getAllUsers}>
               Back To All Users
             </button>

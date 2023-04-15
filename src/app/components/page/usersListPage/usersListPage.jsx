@@ -7,22 +7,25 @@ import SearchStatus from "../../ui/searchStatus";
 import UsersTable from "../../ui/usersTable";
 import _ from "lodash";
 import SearchUser from "../../ui/searchUser";
-import { useUser } from "../../../hooks/useUsers";
-import { useProfession } from "../../../hooks/useProfession";
-import { useAuth } from "../../../hooks/useAuth";
+import {
+  getProfessions,
+  getProfessionsLoadingStatus,
+} from "../../../store/professions";
+import { useSelector } from "react-redux";
+import { getCurrentUserId, getUsers } from "../../../store/users";
 
 const UsersListPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { isLoading: professionLoading, professions } = useProfession();
+  const professions = useSelector(getProfessions());
+  const professionsLoading = useSelector(getProfessionsLoadingStatus());
   const [selectedProf, setSelectedProf] = useState();
   const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
 
   const pageSize = 8;
 
-  const { users } = useUser();
-  // console.log(users);
+  const users = useSelector(getUsers());
   const [searchedUsers, setSearchedUsers] = useState("");
-  const { currentUser } = useAuth();
+  const currentUserId = useSelector(getCurrentUserId());
 
   // const handleDelete = (userId) => {
   //   setUsers(users.filter((user) => user._id !== userId));
@@ -74,7 +77,7 @@ const UsersListPage = () => {
             return user.profession._id === selectedProf._id;
           })
         : data;
-      return filteredUsers.filter((user) => user._id !== currentUser._id);
+      return filteredUsers.filter((user) => user._id !== currentUserId._id);
     }
 
     const filteredUsers = filterUsersList(users);
@@ -87,7 +90,7 @@ const UsersListPage = () => {
 
     return (
       <div className="d-flex w-75">
-        {!professionLoading && professions && (
+        {!professionsLoading && professions && (
           <div className="d-flex flex-column flex-shrink-0 p-3">
             <GroupList
               selectedItem={selectedProf}
